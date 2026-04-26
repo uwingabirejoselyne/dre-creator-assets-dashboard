@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAssets } from './hooks/useAssets'
 import { useAssetFilter } from './hooks/useAssetFilter'
 import { AssetList } from './components/AssetList'
+import { AssetDetail } from './components/AssetDetail'
 import { SearchBar } from './components/SearchBar'
 import { FilterBar } from './components/FilterBar'
 import type { Asset } from './types/asset'
@@ -64,11 +65,8 @@ function App() {
         />
       </main>
 
-      {/* Temp: show selected asset name */}
       {selectedAsset && (
-        <p className="fixed bottom-4 right-4 bg-gray-800 text-white text-sm px-4 py-2 rounded-lg shadow">
-          Selected: {selectedAsset.name}
-        </p>
+        <AssetDetail asset={selectedAsset} onClose={() => setSelectedAsset(null)} />
       )}
     </div>
   )
