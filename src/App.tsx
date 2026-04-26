@@ -1,10 +1,23 @@
 import { useState } from 'react'
 import { useAssets } from './hooks/useAssets'
+import { useAssetFilter } from './hooks/useAssetFilter'
 import { AssetList } from './components/AssetList'
+import { SearchBar } from './components/SearchBar'
+import { FilterBar } from './components/FilterBar'
 import type { Asset } from './types/asset'
 
 function App() {
   const { assets, loading, error } = useAssets()
+  const {
+    filtered,
+    query,
+    setQuery,
+    typeFilter,
+    setTypeFilter,
+    statusFilter,
+    setStatusFilter,
+  } = useAssetFilter(assets)
+
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null)
 
   return (
@@ -22,15 +35,29 @@ function App() {
 
       {/* Main */}
       <main className="max-w-6xl mx-auto px-6 py-8">
-        <div className="flex items-center justify-between mb-6">
+        {/* Search + Filter toolbar */}
+        <div className="flex flex-col gap-4 mb-6">
+          <SearchBar value={query} onChange={setQuery} />
+          <FilterBar
+            typeFilter={typeFilter}
+            statusFilter={statusFilter}
+            onTypeChange={setTypeFilter}
+            onStatusChange={setStatusFilter}
+          />
+        </div>
+
+        {/* Results count */}
+        <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-100">All Assets</h2>
           {!loading && !error && (
-            <span className="text-sm text-gray-500">{assets.length} assets</span>
+            <span className="text-sm text-gray-500">
+              {filtered.length} of {assets.length} assets
+            </span>
           )}
         </div>
 
         <AssetList
-          assets={assets}
+          assets={filtered}
           loading={loading}
           error={error}
           onSelectAsset={setSelectedAsset}
