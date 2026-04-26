@@ -5,10 +5,14 @@ import { AssetList } from './components/AssetList'
 import { AssetDetail } from './components/AssetDetail'
 import { SearchBar } from './components/SearchBar'
 import { FilterBar } from './components/FilterBar'
-import type { Asset } from './types/asset'
+import { UploadForm } from './components/UploadForm'
+import type { Asset, NewAssetPayload } from './types/asset'
 
 function App() {
-  const { assets, loading, error } = useAssets()
+  const { assets: fetchedAssets, loading, error } = useAssets()
+  const [extraAssets, setExtraAssets] = useState<Asset[]>([])
+  const allAssets = [...fetchedAssets, ...extraAssets]
+
   const {
     filtered,
     query,
@@ -17,9 +21,22 @@ function App() {
     setTypeFilter,
     statusFilter,
     setStatusFilter,
-  } = useAssetFilter(assets)
+  } = useAssetFilter(allAssets)
 
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null)
+  const [showUploadForm, setShowUploadForm] = useState(false)
+
+  function handleCreateAsset(payload: NewAssetPayload) {
+    const newAsset: Asset = {
+      ...payload,
+      id: crypto.randomUUID(),
+      size: 0,
+      url: `/assets/${payload.name.toLowerCase().replace(/\s+/g, '-')}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+    setExtraAssets((prev) => [newAsset, ...prev])
+  }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -29,7 +46,10 @@ function App() {
           <h1 className="text-xl font-bold text-indigo-400">DRE Creator Assets</h1>
           <p className="text-xs text-gray-500 mt-0.5">Digital Realm Entertainment</p>
         </div>
-        <button className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+        <button
+          onClick={() => setShowUploadForm(true)}
+          className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+        >
           + Upload Asset
         </button>
       </header>
@@ -52,7 +72,7 @@ function App() {
           <h2 className="text-lg font-semibold text-gray-100">All Assets</h2>
           {!loading && !error && (
             <span className="text-sm text-gray-500">
-              {filtered.length} of {assets.length} assets
+              {filtered.length} of {allAssets.length} assets
             </span>
           )}
         </div>
@@ -65,8 +85,19 @@ function App() {
         />
       </main>
 
+      {/* Detail panel */}
       {selectedAsset && (
         <AssetDetail asset={selectedAsset} onClose={() => setSelectedAsset(null)} />
+      )}
+
+      {/* Upload form modal */}
+      {showUploadForm && (
+        <UploadForm
+          onSubmit={(payload) => {
+            handleCreateAsset(payload)
+          }}
+          onClose={() => setShowUploadForm(false)}
+        />
       )}
     </div>
   )
