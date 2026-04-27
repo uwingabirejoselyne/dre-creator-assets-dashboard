@@ -25,6 +25,14 @@ function App() {
     setSort,
   } = useAssetFilter(allAssets)
 
+  const isFiltered = query !== '' || typeFilter !== 'all' || statusFilter !== 'all'
+
+  function handleClearFilters() {
+    setQuery('')
+    setTypeFilter('all')
+    setStatusFilter('all')
+  }
+
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null)
   const [showUploadForm, setShowUploadForm] = useState(false)
 
@@ -81,6 +89,8 @@ function App() {
             loading={loading}
             error={error}
             onSelectAsset={setSelectedAsset}
+            isFiltered={isFiltered}
+            onClearFilters={handleClearFilters}
           />
         </main>
       </div>

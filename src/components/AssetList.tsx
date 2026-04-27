@@ -6,9 +6,11 @@ interface Props {
   loading: boolean
   error: string | null
   onSelectAsset: (asset: Asset) => void
+  isFiltered?: boolean
+  onClearFilters?: () => void
 }
 
-export function AssetList({ assets, loading, error, onSelectAsset }: Props) {
+export function AssetList({ assets, loading, error, onSelectAsset, isFiltered, onClearFilters }: Props) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-gray-400" role="status">
@@ -30,8 +32,20 @@ export function AssetList({ assets, loading, error, onSelectAsset }: Props) {
   if (assets.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-gray-500">
-        <p className="text-lg font-semibold mb-1">No assets found</p>
-        <p className="text-sm">Try adjusting your search or filters.</p>
+        <p className="text-lg font-semibold mb-1">
+          {isFiltered ? 'No assets match your filters' : 'No assets found'}
+        </p>
+        <p className="text-sm mb-4">
+          {isFiltered ? 'Try a different search term or clear your filters.' : 'Upload your first asset to get started.'}
+        </p>
+        {isFiltered && onClearFilters && (
+          <button
+            onClick={onClearFilters}
+            className="text-sm text-indigo-400 hover:text-indigo-300 border border-indigo-500/40 hover:border-indigo-400 px-4 py-2 rounded-lg transition-colors"
+          >
+            Clear filters
+          </button>
+        )}
       </div>
     )
   }
