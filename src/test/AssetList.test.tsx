@@ -63,4 +63,33 @@ describe('AssetList', () => {
     await userEvent.click(screen.getByText('Test Banner'))
     expect(onSelect).toHaveBeenCalledWith(mockAsset)
   })
+
+  it('shows a generic empty state when no assets exist and no filters are active', () => {
+    render(
+      <AssetList assets={[]} loading={false} error={null} onSelectAsset={vi.fn()} isFiltered={false} />,
+    )
+    expect(screen.getByText(/no assets found/i)).toBeInTheDocument()
+    expect(screen.getByText(/upload your first asset/i)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /clear filters/i })).not.toBeInTheDocument()
+  })
+
+  it('shows a filtered empty state with a clear filters button when filters are active', async () => {
+    const onClear = vi.fn()
+    render(
+      <AssetList
+        assets={[]}
+        loading={false}
+        error={null}
+        onSelectAsset={vi.fn()}
+        isFiltered={true}
+        onClearFilters={onClear}
+      />,
+    )
+    expect(screen.getByText(/no assets match your filters/i)).toBeInTheDocument()
+    expect(screen.getByText(/try a different search term/i)).toBeInTheDocument()
+    const clearBtn = screen.getByRole('button', { name: /clear filters/i })
+    expect(clearBtn).toBeInTheDocument()
+    await userEvent.click(clearBtn)
+    expect(onClear).toHaveBeenCalledOnce()
+  })
 })

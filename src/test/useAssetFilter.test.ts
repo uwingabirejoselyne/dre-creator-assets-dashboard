@@ -88,3 +88,61 @@ describe('useAssetFilter', () => {
     expect(result.current.filtered).toHaveLength(0)
   })
 })
+
+describe('useAssetFilter — URL state', () => {
+  beforeEach(() => {
+    window.history.replaceState(null, '', '/')
+  })
+
+  it('reads initial query from the URL', () => {
+    window.history.replaceState(null, '', '/?q=hero')
+    const { result } = renderHook(() => useAssetFilter(assets))
+    expect(result.current.query).toBe('hero')
+    expect(result.current.filtered).toHaveLength(1)
+    expect(result.current.filtered[0].name).toBe('Hero Banner')
+  })
+
+  it('reads initial type filter from the URL', () => {
+    window.history.replaceState(null, '', '/?type=video')
+    const { result } = renderHook(() => useAssetFilter(assets))
+    expect(result.current.typeFilter).toBe('video')
+    expect(result.current.filtered).toHaveLength(1)
+    expect(result.current.filtered[0].type).toBe('video')
+  })
+
+  it('reads initial status filter from the URL', () => {
+    window.history.replaceState(null, '', '/?status=archived')
+    const { result } = renderHook(() => useAssetFilter(assets))
+    expect(result.current.statusFilter).toBe('archived')
+    expect(result.current.filtered).toHaveLength(1)
+    expect(result.current.filtered[0].status).toBe('archived')
+  })
+
+  it('reads initial sort from the URL', () => {
+    window.history.replaceState(null, '', '/?sort=name-asc')
+    const { result } = renderHook(() => useAssetFilter(assets))
+    expect(result.current.sort).toBe('name-asc')
+    // name-asc: Brand Guide < Hero Banner < Intro Reel
+    expect(result.current.filtered[0].name).toBe('Brand Guide')
+  })
+
+  it('updates the URL when a filter changes', () => {
+    const { result } = renderHook(() => useAssetFilter(assets))
+    act(() => result.current.setTypeFilter('audio'))
+    expect(window.location.search).toContain('type=audio')
+  })
+
+  it('removes a param from the URL when filter is reset to default', () => {
+    window.history.replaceState(null, '', '/?type=image')
+    const { result } = renderHook(() => useAssetFilter(assets))
+    act(() => result.current.setTypeFilter('all'))
+    expect(window.location.search).not.toContain('type')
+  })
+
+  it('ignores unknown values in URL params and falls back to default', () => {
+    window.history.replaceState(null, '', '/?type=gif&status=pending')
+    const { result } = renderHook(() => useAssetFilter(assets))
+    expect(result.current.typeFilter).toBe('all')
+    expect(result.current.statusFilter).toBe('all')
+  })
+})
