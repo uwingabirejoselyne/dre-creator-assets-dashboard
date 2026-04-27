@@ -99,9 +99,3 @@ export const mockAssets: Asset[] = [
   },
 ]
 
-/** Simulate a short async delay like a real API would have */
-export function fetchAssets(): Promise<Asset[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(mockAssets), 600)
-  })
-}

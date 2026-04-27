@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { fetchAssets } from '../data/mockAssets'
 import type { Asset } from '../types/asset'
 
 interface UseAssetsResult {
@@ -17,7 +16,11 @@ export function useAssets(): UseAssetsResult {
     setLoading(true)
     setError(null)
 
-    fetchAssets()
+    fetch('/api/assets')
+      .then((res) => {
+        if (!res.ok) throw new Error('Network response was not ok')
+        return res.json() as Promise<Asset[]>
+      })
       .then((data) => setAssets(data))
       .catch(() => setError('Failed to load assets. Please try again.'))
       .finally(() => setLoading(false))
