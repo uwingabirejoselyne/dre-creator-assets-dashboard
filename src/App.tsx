@@ -21,6 +21,8 @@ function App() {
     setTypeFilter,
     statusFilter,
     setStatusFilter,
+    sort,
+    setSort,
   } = useAssetFilter(allAssets)
 
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null)
@@ -54,7 +56,7 @@ function App() {
         {/* Top bar */}
         <header className="shrink-0 border-b border-gray-800 px-6 py-3 flex items-center gap-4">
           <div className="flex-1">
-            <SearchBar value={query} onChange={setQuery} />
+            <SearchBar value={query} onChange={setQuery} sort={sort} onSortChange={setSort} />
           </div>
           <div className="flex items-center gap-3 shrink-0">
             {!loading && !error && (

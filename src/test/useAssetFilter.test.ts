@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { useAssetFilter } from '../hooks/useAssetFilter'
 import type { Asset } from '../types/asset'
 
@@ -43,6 +43,10 @@ const assets: Asset[] = [
 ]
 
 describe('useAssetFilter', () => {
+  beforeEach(() => {
+    window.history.replaceState(null, '', '/')
+  })
+
   it('returns all assets when no filter is applied', () => {
     const { result } = renderHook(() => useAssetFilter(assets))
     expect(result.current.filtered).toHaveLength(3)
